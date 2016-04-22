@@ -1,14 +1,21 @@
 #include<vector>
 #include<set>
 #include<algorithm>
+#include<iostream>
 #include "Point.h"
 #include "optics.h"
 
+float getProgress(int curr, int total){
+	return static_cast<float>(100*curr)/total;
+}
 
 
 void optics(std::vector<Point> &pts,float eps,int minPTS){
 	int order=0;
-	for(int i=0;i<pts.size();++i){
+	int nevts=pts.size();
+	for(int i=0;i<nevts;++i){
+		if(i%(nevts/30)==0)
+			std::cout << "OPTICS PROGRESS:" << getProgress(i,nevts) << "%" << std::endl;
 		if(!pts[i].processed){
 			pts[i].processed=true;
 			std::set<int> nbhd = getNBHD(pts,i,eps,minPTS);

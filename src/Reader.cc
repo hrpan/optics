@@ -68,6 +68,7 @@ void Reader::ptsInit(std::vector<Point> &pts){
 		pts.push_back(p_tmp);
 	}
 	std::cout << "POINTS INITIALIZATION COMPLETE" << std::endl;
+	ptsNorm(pts);
 }
 
 void Reader::ptsNorm(std::vector<Point> &pts){
@@ -81,3 +82,26 @@ void Reader::ptsNorm(std::vector<Point> &pts){
 	std::cout << "POINTS NORMALIZATION COMPLETE" << std::endl;
 }
 
+void Reader::treeFill(std::vector<Point> &pts){
+	int n = pts.size();
+	for(int i=0;i<n;++i){
+		order=pts[i].order;
+		r_dist=pts[i].reach_dist;
+		tr_out->Fill();
+	}
+	std::cout << "TREE FILLING COMPLETE" << std::endl;
+}
+
+void Reader::closeFiles(){
+	f_in->Close();
+	f_out->Write();
+	f_out->Close();	
+}
+
+float Reader::getEPS(){
+	return eps;
+}
+
+int Reader::getMINPTS(){
+	return minPTS;
+}

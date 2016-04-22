@@ -29,7 +29,7 @@ void optics(std::vector<Point> &pts,float eps,int minPTS){
 	}
 }
 
-void update(std::vector<Point> &pts,std::set<int> nbhd,int p_idx,std::set<Point*,ptComp> seeds, float eps, int minPTS){
+void update(std::vector<Point> &pts,std::set<int> &nbhd,int p_idx,std::set<Point*,ptComp> seeds, float eps, int minPTS){
 	float core_dist=pts[p_idx].core_dist;
 	for(std::set<int>::iterator it=nbhd.begin();it!=nbhd.end();++it){
 		if(!pts[*it].processed){
@@ -45,3 +45,40 @@ void update(std::vector<Point> &pts,std::set<int> nbhd,int p_idx,std::set<Point*
 		}
 	}
 }
+
+std::set<int> getNBHD(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
+
+	const static int npts = pts.size();
+
+	std::vector<float> distVec;
+	std::set<int> nbhd;
+
+	int count=0;
+
+	for(int i=0;i<npts;++i){
+		float d = dist(pts[p_idx],pts[i]);
+		if(d<eps&&i!=p_idx){
+			nbhd.insert(i);
+			++count;
+		}
+		distVec.push_back(d);
+	}
+
+	if(count>minPTS){
+		sort(distVec.begin(),distVec.end());
+		pts[p_idx].core_dist=distVec[minPTS];
+	}
+
+	return nbhd;
+
+}
+
+
+
+
+
+
+
+
+
+

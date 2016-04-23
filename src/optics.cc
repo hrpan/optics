@@ -29,13 +29,14 @@ void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
 
 	pts[p_idx].processed=true;
 	pts[p_idx].order=ordering++;
-
+	//std::cout << "CORE DIST: " << pts[p_idx].core_dist << std::endl;
 	if(pts[p_idx].core_dist!=-1){
 
 		std::set<Point*,ptComp> seeds;
 		update(pts,nbhd,p_idx,seeds);
 
 		while(!seeds.empty()){
+			//std::cout << "SEED SIZE:" << seeds.size() << std::endl;
 			std::set<Point*,ptComp>::iterator it=seeds.begin();
 			std::set<int> nbhd_tmp=getNBHD(pts,(**it).index,eps,minPTS);
 			(**it).processed=true;
@@ -43,26 +44,37 @@ void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
 
 			if((**it).core_dist!=-1)
 				update(pts,nbhd_tmp,(**it).index,seeds);
+			seeds.erase(it);
 		}
 	}
 }
 
 
 
-void update(std::vector<Point> &pts,std::set<int> &nbhd,int p_idx,std::set<Point*,ptComp> seeds){
+void update(std::vector<Point> &pts,std::set<int> &nbhd,int p_idx,std::set<Point*,ptComp> &seeds){
+
 	float core_dist=pts[p_idx].core_dist;
+
 	for(std::set<int>::iterator it=nbhd.begin();it!=nbhd.end();++it){
+
 		if(!pts[*it].processed){
+
 			float reach_dist=std::max(core_dist,dist(pts[*it],pts[p_idx]));
+
 			if(pts[*it].reach_dist==-1){
+
 				pts[*it].reach_dist=reach_dist;
 				seeds.insert(&pts[*it]);
+
 			}else if(reach_dist<pts[*it].reach_dist){
+
 				pts[*it].reach_dist=reach_dist;
 				seeds.erase(&pts[*it]);
 				seeds.insert(&pts[*it]);
+
 			}
 		}
+
 	}
 }
 

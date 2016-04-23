@@ -11,32 +11,45 @@ float getProgress(int curr, int total){
 
 
 void optics(std::vector<Point> &pts,float eps,int minPTS){
-	int order=0;
 	int nevts=pts.size();
 	for(int i=0;i<nevts;++i){
 		if(i%(nevts/30)==0)
 			std::cout << "OPTICS PROGRESS:" << getProgress(i,nevts) << "%" << std::endl;
 		if(!pts[i].processed){
-			pts[i].processed=true;
-			std::set<int> nbhd = getNBHD(pts,i,eps,minPTS);
-			pts[i].order=order++;
-			if(pts[i].core_dist!=-1){
-				std::set<Point*,ptComp> seeds;
-				update(pts,nbhd,i,seeds,eps,minPTS);
-				while(!seeds.empty()){
-					std::set<Point*,ptComp>::iterator it=seeds.begin();
-					std::set<int> nbhd_tmp=getNBHD(pts,(**it).index,eps,minPTS);
-					(**it).processed=true;
-					(**it).order=order++;
-					if((**it).core_dist!=-1)
-						update(pts,nbhd_tmp,(**it).index,seeds,eps,minPTS);
-				}
-			}	
+			expandCluster(pts,i,eps,minPTS);
 		}
 	}
 }
 
-void update(std::vector<Point> &pts,std::set<int> &nbhd,int p_idx,std::set<Point*,ptComp> seeds, float eps, int minPTS){
+void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
+
+	static int ordering=0;
+
+	std::set<int> nbhd=getNBHD(pts,p_idx,eps,minPTS);
+
+	pts[p_idx].processed=true;
+	pts[p_idx].order=ordering++;
+
+	if(pts[p_idx].core_dist!=-1){
+
+		std::set<Point*,ptComp> seeds;
+		update(pts,nbhd,p_idx,seeds);
+
+		while(!seeds.empty()){
+			std::set<Point*,ptComp>::iterator it=seeds.begin();
+			std::set<int> nbhd_tmp=getNBHD(pts,(**it).index,eps,minPTS);
+			(**it).processed=true;
+			(**it).order=ordering++;
+
+			if((**it).core_dist!=-1)
+				update(pts,nbhd_tmp,(**it).index,seeds);
+		}
+	}
+}
+
+
+
+void update(std::vector<Point> &pts,std::set<int> &nbhd,int p_idx,std::set<Point*,ptComp> seeds){
 	float core_dist=pts[p_idx].core_dist;
 	for(std::set<int>::iterator it=nbhd.begin();it!=nbhd.end();++it){
 		if(!pts[*it].processed){

@@ -11,11 +11,7 @@ struct Point{
 	int order;
 };
 
-struct ptComp{
-	bool operator()(const Point *p1, const Point *p2){
-		return (*p1).reach_dist<(*p2).reach_dist;
-	}
-};
+bool ptComp(Point *p1, Point *p2);
 
 
 

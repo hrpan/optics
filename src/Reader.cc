@@ -18,12 +18,12 @@ void Reader::Initialize(){
 	input >> eps >> minPTS;
 	std::cout << "EPS: " << eps << " minPTS: " << minPTS << std::endl;
 	input >> nVar;
-	std::cout << "Number of variables: " << nVar << std::endl;
+	std::cout << "NUMBER OF VARIABLES: " << nVar << std::endl;
 	
 	std::string tmp;
 	for(int i=0;i<nVar;++i){
 		input >> tmp;
-		std::cout << "Setting variable" << i << ": " << tmp << std::endl;
+		std::cout << "SETTING VARIABLE" << i+1 << ": " << tmp << std::endl;
 		varName.push_back(tmp);
 	}		
 

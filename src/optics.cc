@@ -97,8 +97,8 @@ std::set<int> getNBHD(std::vector<Point> &pts, int p_idx, float eps, int minPTS)
 	}
 
 	if(count>minPTS){
-		sort(distVec.begin(),distVec.end());
-		pts[p_idx].core_dist=distVec[minPTS];
+		std::nth_element(distVec.begin(),distVec.begin()+minPTS,distVec.end());
+		pts[p_idx].core_dist=*(distVec.begin()+minPTS);
 	}
 
 	return nbhd;

@@ -8,8 +8,7 @@ static int nprocessed = 0;
 static int ntotal;
 
 void checkProgress(){
-	++nprocessed;
-	if(nprocessed%(ntotal/30)==0)
+	if(++nprocessed%(ntotal/1000)==0)
 		std::cout << "OPTICS Progress:" <<  static_cast<float>(100*nprocessed)/ntotal << "%" << std::endl; 
 }
 
@@ -41,7 +40,7 @@ void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
 		update(pts,nbhd,p_idx,seeds);
 
 		while(!seeds.empty()){
-			std::cout << "CURRENT SEED SIZE:" << seeds.size() << std::endl;
+			//std::cout << "CURRENT SEED SIZE:" << seeds.size() << std::endl;
 			std::deque<Point*>::iterator min_it = std::min_element(seeds.begin(),seeds.end(),ptComp);
 			Point *currentPoint = *min_it;
 			seeds.erase(min_it);
@@ -91,18 +90,16 @@ std::set<int> getNBHD(std::vector<Point> &pts, int p_idx, float eps, int minPTS)
 	std::vector<float> distVec;
 	std::set<int> nbhd;
 
-	int count=0;
 
 	for(int i=0;i<npts;++i){
 		float d = dist(pts[p_idx],pts[i]);
 		if(d<eps&&i!=p_idx){
 			nbhd.insert(i);
-			++count;
 			distVec.push_back(d);
 		}
 	}
 
-	if(count>minPTS){
+	if(distVec.size()>minPTS){
 		std::nth_element(distVec.begin(),distVec.begin()+minPTS,distVec.end());
 		pts[p_idx].core_dist=*(distVec.begin()+minPTS);
 	}

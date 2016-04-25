@@ -1,4 +1,5 @@
 #include "Reader.h"
+#include<iomanip>
 #include<cmath>
 
 Reader::Reader(std::string ifname){
@@ -21,12 +22,14 @@ void Reader::Initialize(){
 	std::cout << "NUMBER OF VARIABLES: " << nVar << std::endl;
 	
 	std::string tmp;
+	std::vector<float> w(nVar,0);
 	for(int i=0;i<nVar;++i){
-		input >> tmp;
-		std::cout << "SETTING VARIABLE" << i+1 << ": " << tmp << std::endl;
+		input >> tmp >> w[i];
+		std::cout << "SETTING VARIABLE" << i+1 << ": " << std::setw(5) << tmp << " WEIGHT: " << w[i] << std::endl;
 		varName.push_back(tmp);
 	}		
 
+	setWeight(w);
 	var.resize(nVar,0);
 	sum.resize(nVar,0);
 	sumsq.resize(nVar,0);
@@ -47,7 +50,7 @@ void Reader::setTrees(){
 
 	tr_out->Branch("order",&order);
 	tr_out->Branch("r_dist",&r_dist);
-
+	tr_out->Branch("c_dist",&c_dist);
 	std::cout << "BRANCH SETTING COMPLETE" << std::endl;
 }
 
@@ -87,6 +90,7 @@ void Reader::treeFill(std::vector<Point> &pts){
 	for(int i=0;i<n;++i){
 		order=pts[i].order;
 		r_dist=pts[i].reach_dist;
+		c_dist=pts[i].core_dist;
 		tr_out->Fill();
 	}
 	std::cout << "TREE FILLING COMPLETE" << std::endl;

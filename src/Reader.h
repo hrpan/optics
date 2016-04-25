@@ -15,6 +15,7 @@ class Reader{
 		int nVar;
 		int order;
 		float r_dist;
+		float c_dist;
 		std::string inputFileName;
 		std::string inputTreeName;
 		std::string outputFileName;

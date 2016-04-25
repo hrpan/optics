@@ -4,17 +4,21 @@
 #include "Point.h"
 #include "optics.h"
 
-float getProgress(int curr, int total){
-	return static_cast<float>(100*curr)/total;
+static int nprocessed = 0;
+static int ntotal;
+
+void checkProgress(){
+	++nprocessed;
+	if(nprocessed%(ntotal/30)==0)
+		std::cout << "OPTICS Progress:" <<  static_cast<float>(100*nprocessed)/ntotal << "%" << std::endl; 
 }
 
 
 void optics(std::vector<Point> &pts,float eps,int minPTS){
 	int nevts=pts.size();
+	ntotal=nevts;
 	std::cout << "DATA SIZE: " << nevts << std::endl;
 	for(int i=0;i<nevts;++i){
-		if(i%(nevts/30)==0)
-			std::cout << "OPTICS PROGRESS:" << getProgress(i,nevts) << "%" << std::endl;
 		if(!pts[i].processed){
 			expandCluster(pts,i,eps,minPTS);
 		}
@@ -28,9 +32,10 @@ void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
 	std::set<int> nbhd=getNBHD(pts,p_idx,eps,minPTS);
 
 	pts[p_idx].processed=true;
+	checkProgress();
 	pts[p_idx].order=ordering++;
 
-	if(pts[p_idx].core_dist!=-1){
+	if(pts[p_idx].core_dist>0){
 
 		std::deque<Point*> seeds;
 		update(pts,nbhd,p_idx,seeds);
@@ -42,9 +47,10 @@ void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
 			seeds.erase(min_it);
 			std::set<int> nbhd_tmp=getNBHD(pts,(*currentPoint).index,eps,minPTS);
 			(*currentPoint).processed=true;
+			checkProgress();
 			(*currentPoint).order=ordering++;
 
-			if((*currentPoint).core_dist!=-1)
+			if((*currentPoint).core_dist>0)
 				update(pts,nbhd_tmp,(*currentPoint).index,seeds);
 
 		}
@@ -63,7 +69,7 @@ void update(std::vector<Point> &pts,std::set<int> &nbhd,int p_idx,std::deque<Poi
 
 			float reach_dist=std::max(core_dist,dist(pts[*it],pts[p_idx]));
 			
-			if(pts[*it].reach_dist==-1){
+			if(pts[*it].reach_dist<0){
 
 				pts[*it].reach_dist=reach_dist;
 				seeds.push_back(&pts[*it]);
@@ -92,8 +98,8 @@ std::set<int> getNBHD(std::vector<Point> &pts, int p_idx, float eps, int minPTS)
 		if(d<eps&&i!=p_idx){
 			nbhd.insert(i);
 			++count;
+			distVec.push_back(d);
 		}
-		distVec.push_back(d);
 	}
 
 	if(count>minPTS){

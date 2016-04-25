@@ -37,9 +37,9 @@ void expandCluster(std::vector<Point> &pts, int p_idx, float eps, int minPTS){
 
 		while(!seeds.empty()){
 			std::cout << "CURRENT SEED SIZE:" << seeds.size() << std::endl;
-			std::sort(seeds.begin(),seeds.end(),ptComp);
-			Point *currentPoint = seeds.front();
-			seeds.pop_front();
+			std::deque<Point*>::iterator min_it = std::min_element(seeds.begin(),seeds.end(),ptComp);
+			Point *currentPoint = *min_it;
+			seeds.erase(min_it);
 			std::set<int> nbhd_tmp=getNBHD(pts,(*currentPoint).index,eps,minPTS);
 			(*currentPoint).processed=true;
 			(*currentPoint).order=ordering++;

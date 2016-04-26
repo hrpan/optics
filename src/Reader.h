@@ -2,6 +2,7 @@
 #define READER_H
 #include "TFile.h"
 #include "TTree.h"
+#include "TString.h"
 #include "Point.h"
 #include<iostream>
 #include<fstream>
@@ -16,10 +17,10 @@ class Reader{
 		int order;
 		float r_dist;
 		float c_dist;
-		std::string inputFileName;
-		std::string inputTreeName;
-		std::string outputFileName;
-		std::string outputTreeName;
+		TString inputFileName;
+		TString inputTreeName;
+		TString outputFileName;
+		TString outputTreeName;
 		TFile *f_in;
 		TFile *f_out;
 		TTree *tr_in;
@@ -34,6 +35,7 @@ class Reader{
 	public :
 		Reader(std::string);
 		void Initialize();
+		void setFiles();
 		void setTrees();
 		void ptsInit(std::vector<Point> &pts);
 		void ptsNorm(std::vector<Point> &pts);

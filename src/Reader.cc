@@ -9,19 +9,24 @@ Reader::Reader(std::string ifname){
 
 
 void Reader::Initialize(){
-
-	input >> inputFileName >> inputTreeName;
+	std::string tmp;
+	input >> tmp;
+	inputFileName=tmp;
 	std::cout << "Input TFile: " << inputFileName << std::endl;
+	input >> tmp;
+	inputTreeName=tmp;
 	std::cout << "Input TTree: " << inputTreeName << std::endl;
-	input >> outputFileName >> outputTreeName;
+	input >> tmp;
+	outputFileName=tmp;
 	std::cout << "Output TFile: " << outputFileName << std::endl;
+	input >> tmp;
+	outputTreeName=tmp;
 	std::cout << "Output TTree: " << outputTreeName << std::endl;
 	input >> eps >> minPTS;
 	std::cout << "EPS: " << eps << " minPTS: " << minPTS << std::endl;
 	input >> nVar;
 	std::cout << "NUMBER OF VARIABLES: " << nVar << std::endl;
 	
-	std::string tmp;
 	std::vector<float> w(nVar,0);
 	for(int i=0;i<nVar;++i){
 		input >> tmp >> w[i];
@@ -39,11 +44,27 @@ void Reader::Initialize(){
 	setTrees();
 }
 
+void Reader::setFiles(){
+	f_in = new TFile(inputFileName,"READ");
+	f_out = new TFile(outputFileName,"CREATE");
+
+	outputFileName.ReplaceAll(".root","");
+
+	while(!f_out->IsOpen()){
+
+		static int counts=0;
+		TString newOFName=TString::Format("%s_%d.root",outputFileName.Data(),++counts);
+		std::cout << "Switching output file to: " << newOFName <<std::endl;
+		f_out = new TFile(newOFName);
+
+	}
+
+	std::cout << "FILE SETTING COMPLETE" << std::endl;
+}
+
 void Reader::setTrees(){
-	f_in = new TFile(inputFileName.c_str(),"READ");
-	tr_in = (TTree*) f_in->Get(inputTreeName.c_str());
-	f_out = new TFile(outputFileName.c_str(),"RECREATE");
-	tr_out = new TTree(outputTreeName.c_str(),"Output from optics");
+	tr_in = (TTree*) f_in->Get(inputTreeName);
+	tr_out = new TTree(outputTreeName,"Output from optics");
 
 	for(int i=0;i<nVar;++i)
 		tr_in->SetBranchAddress(varName[i].c_str(),&var[i]);	
